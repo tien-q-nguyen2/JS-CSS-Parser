@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Parser</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+    <link rel="stylesheet" href="parser.css">
+</head>
+
+<body>
+    <h1>JS/CSS Code Processor</h1>
+    <div class = 'wrapper main-area'>
+        <div class = 'textarea-container'>
+            <label for="code-input">Input</label>
+            <textarea name='code-input' id='code-input'></textarea>
+        </div>
+        <div class="button-container">
+            <button id='orientation-btn'>Re- Orient</button>
+            <button id='fix-indent-btn'>Fix Indent</button>
+            <button id='css-to-sass-btn'>CSS to SASS</button>
+        </div>
+        <div class = 'textarea-container'>
+            <label for="code-output">Output</label>
+            <textarea name='code-output' id='code-output'></textarea>
+        </div>
+    </div>
+    <script src='parser.js'></script>
+</body>
+</html>
