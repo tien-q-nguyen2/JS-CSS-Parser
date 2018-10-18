@@ -1,7 +1,7 @@
-$(document).ready(function(){
+(function(){
 	var codeInput = '';
 	function getCodeFromTextArea() {
-		var val = $('#code-input').val();
+		var val = document.getElementById('code-input').value;
 		codeInput = val;
 	}
 	
@@ -22,8 +22,8 @@ $(document).ready(function(){
 	}
 	
 	var orientationFlipped = false;
-	var orientationButton = $('#orientation-btn');
-	orientationButton.click(function() {
+	var orientationButton = document.getElementById('orientation-btn');
+	orientationButton.addEventListener('click', function() {
 		var mainArea = document.getElementsByClassName('main-area')[0];
 		var buttons = mainArea.getElementsByTagName('button');
 		var buttonContainer = document.getElementsByClassName('button-container')[0];
@@ -57,18 +57,18 @@ $(document).ready(function(){
 		}
 	})
 	
-	var getCodeButton = $('#fix-indent-btn');
-	getCodeButton.click(getCodeFromTextArea);
-	getCodeButton.click(fixIndentation);
+	var getCodeButton = document.getElementById('fix-indent-btn');
+	getCodeButton.addEventListener('click', getCodeFromTextArea);
+	getCodeButton.addEventListener('click', fixIndentation);
 	
-	var cssToSassButton = $('#css-to-sass-btn');
-	cssToSassButton.click(getCodeFromTextArea);
-	cssToSassButton.click(convertCssToSass);
+	var cssToSassButton = document.getElementById('css-to-sass-btn');
+	cssToSassButton.addEventListener('click', getCodeFromTextArea);
+	cssToSassButton.addEventListener('click', convertCssToSass);
 	
 	
 	//=================FIX INDENTATION CODE SECTION==================//
 	//(haven't supported dealing with curly brackets inside /* */ comment blocks yet)
-
+	
 	//This function count syntactically significant } & { in a line to determine
 	function countIndent(line){	//whether to change the current indent level
 		var indent = 0;
@@ -124,7 +124,7 @@ $(document).ready(function(){
 				currentIndentLevel += countIndent(currentLine);
 			}
 		}
-		$('#code-output').val(outputString);
+		document.getElementById('code-output').innerHTML = outputString;
 	}
 	
 	
@@ -143,55 +143,55 @@ $(document).ready(function(){
 			if (lastCharOfCurrentLine == '{'){
 				selectorLineNums.push(i);
 				linesWithSelectors.push(currentLine.replace(/{/g,'').trim())
-				}
 			}
-			selectorLineNums.push(linesOfCode.length);
+		}
+		selectorLineNums.push(linesOfCode.length);
+		
+		//ind is the index of the list containing the line numbers with selectors
+		for (var ind = 0; ind < selectorLineNums.length - 1; ind++){
+			var lineWithSels = linesWithSelectors[ind];
 			
-			//ind is the index of the list containing the line numbers with selectors
-			for (var ind = 0; ind < selectorLineNums.length - 1; ind++){
-				var lineWithSels = linesWithSelectors[ind];
+			var startLineToProcess = selectorLineNums[ind] + 1;
+			var endLineToProcess = selectorLineNums[ind + 1] - 1;
+			
+			var selectorsGroupings = lineWithSels.split(',')
+			.map(item => item.trim());
+			
+			//selectors groupings are things like header ul li, .card img
+			for (var j = 0; j < selectorsGroupings.length; j++){
+				var selectorsGroup = selectorsGroupings[j];
 				
-				var startLineToProcess = selectorLineNums[ind] + 1;
-				var endLineToProcess = selectorLineNums[ind + 1] - 1;
+				//Replace multiple adjacent spaces with a single space
+				var selectorFragments = selectorsGroup.replace(/  +/g, ' ').split(' ');
 				
-				var selectorsGroupings = lineWithSels.split(',')
-				.map(item => item.trim());
-				
-				//selectors groupings are things like header ul li, .card img
-				for (var j = 0; j < selectorsGroupings.length; j++){
-					var selectorsGroup = selectorsGroupings[j];
-					
-					//Replace multiple adjacent spaces with a single space
-					var selectorFragments = selectorsGroup.replace(/  +/g, ' ').split(' ');
-					
-					//Assuming there is only one selector grouping if a @media tag is used
-					if (selectorFragments[0] === "@media") { //use that whole selector group
-						//(to be fixed)
-						allSelectors[selectorsGroup] = {props:[]};
-					} else {
-						//The first selector piece (or the only one) in the selector grouping
-						if(!allSelectors[selectorFragments[0]]){ //if it is not yet defined
-							allSelectors[selectorFragments[0]] = {props:[]};
-						}
-						var currentSelector = allSelectors[selectorFragments[0]];
-						
-						for(var k = 1; k < selectorFragments.length; k ++){
-							if(!currentSelector[selectorFragments[k]]){
-								currentSelector[selectorFragments[k]] = {props:[]};
-							}
-							var currentSelector = currentSelector[selectorFragments[k]];
-						}
+				//Assuming there is only one selector grouping if a @media tag is used
+				if (selectorFragments[0] === "@media") { //use that whole selector group
+					//(to be fixed)
+					allSelectors[selectorsGroup] = {props:[]};
+				} else {
+					//The first selector piece (or the only one) in the selector grouping
+					if(!allSelectors[selectorFragments[0]]){ //if it is not yet defined
+						allSelectors[selectorFragments[0]] = {props:[]};
 					}
+					var currentSelector = allSelectors[selectorFragments[0]];
 					
-					//After determining what the deepest level of the selector
-					// group is, we start collecting properties
-					for(var m = startLineToProcess; m <= endLineToProcess; m++){
-						if (linesOfCode[m] == '}') {
-							continue;
+					for(var k = 1; k < selectorFragments.length; k ++){
+						if(!currentSelector[selectorFragments[k]]){
+							currentSelector[selectorFragments[k]] = {props:[]};
 						}
-						var lineToStore = linesOfCode[m]
-						if(lineToStore[lineToStore.length - 1] === '}'){
-							lineToStore = lineToStore.replace(/}/g,'').trim();
+						var currentSelector = currentSelector[selectorFragments[k]];
+					}
+				}
+				
+				//After determining what the deepest level of the selector
+				// group is, we start collecting properties
+				for(var m = startLineToProcess; m <= endLineToProcess; m++){
+					if (linesOfCode[m] == '}') {
+						continue;
+					}
+					var lineToStore = linesOfCode[m]
+					if(lineToStore[lineToStore.length - 1] === '}'){
+						lineToStore = lineToStore.replace(/}/g,'').trim();
 					}
 					currentSelector['props'].push(lineToStore);
 				}
@@ -204,14 +204,10 @@ $(document).ready(function(){
 		//-----Now write back everything as a Sass-friendly file
 		//(under construction)
 		console.log(allSelectors);
-		$('#code-output').val("This feature hasn't been finished yet, but you can open"+ 
-		" the developer's console (assuming a CSS file was input) to see an object with"+ 
-		" a structure resembling SASS's nested selectors structure.");
+		document.getElementById('code-output').innerHTML =
+		"This feature hasn't been finished yet, but you can open the"+
+		" developer's console (assuming a CSS file was input) to see an object with"+
+		" a structure resembling SASS's nested selectors structure.";
 		
 	} // end of convertCssToSass()
-	
-}) // end of document.ready()
-
-
-
-
+})();
