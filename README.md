@@ -4,4 +4,4 @@ Link to most recently deployed page: https://tien-q-nguyen2.github.io/JS-CSS-Par
 
 Description
 --
-A parser that allow correcting the indentation of JS and CSS files -- assuming the provided code's syntax is already correct and curly braces are used for all blocks to be indented. Also will have the functionality to convert CSS code to nested SASS code.
+A parser that allow correcting the indentation of JS and CSS files -- assuming that the provided code contains no syntax error and that curly braces are used for all blocks to be indented. The parser will also have the functionality to convert CSS code to nested SASS code.
