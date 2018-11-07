@@ -58,6 +58,8 @@ textarea {
     font-family: 'Inconsolata', monospace;
     background: #666;
     color: white;
+    overflow: auto;
+    white-space: nowrap;
 }
 
 .main-area-flipped {
