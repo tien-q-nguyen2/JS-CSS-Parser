@@ -85,11 +85,6 @@
 	getCodeButton.addEventListener('click', getCodeFromTextArea);
 	getCodeButton.addEventListener('click', fixIndentation);
 	
-	var cssToSassButton = document.getElementById('css-to-sass-btn');
-	cssToSassButton.addEventListener('click', getCodeFromTextArea);
-	cssToSassButton.addEventListener('click', convertCssToSass);
-	
-	
 	//=================FIX INDENTATION CODE SECTION==================//
 	// Remove comments, regex and contents inside quotes before counting the brackets
 	function getProcessedLinesOfCode(){
@@ -201,90 +196,6 @@
 		
 		document.getElementById('code-output').innerHTML = formattedOutput;
 	}
-	
-	//=================CONVERT CSS TO SASS CODE SECTION==================//
-	
-	function convertCssToSass() {
-		var allSelectors = {};
-		var linesOfCode = codeInput.split('\n').map(item => item.trim());
-		
-		//The line numbers where we encounter selector combinators
-		var selectorLineNums = [];
-		var linesWithSelectors = [];
-		for (var i = 0; i < linesOfCode.length; i++){
-			var currentLine = linesOfCode[i]
-			var lastCharOfCurrentLine = currentLine[currentLine.length - 1];
-			if (lastCharOfCurrentLine == '{'){
-				selectorLineNums.push(i);
-				linesWithSelectors.push(currentLine.replace(/{/g,'').trim())
-			}
-		}
-		selectorLineNums.push(linesOfCode.length);
-		
-		//ind is the index of the list containing the line numbers with selectors
-		for (var ind = 0; ind < selectorLineNums.length - 1; ind++){
-			var lineWithSels = linesWithSelectors[ind];
-			
-			var startLineToProcess = selectorLineNums[ind] + 1;
-			var endLineToProcess = selectorLineNums[ind + 1] - 1;
-			
-			var selectorsGroupings = lineWithSels.split(',')
-			.map(item => item.trim());
-			
-			//selectors groupings are things like header ul li, .card img
-			for (var j = 0; j < selectorsGroupings.length; j++){
-				var selectorsGroup = selectorsGroupings[j];
-				
-				//Replace multiple adjacent spaces with a single space
-				var selectorFragments = selectorsGroup.replace(/  +/g, ' ').split(' ');
-				
-				//Assuming there is only one selector grouping if a @media tag is used
-				if (selectorFragments[0] === "@media") { //use that whole selector group
-					//(to be fixed)
-					allSelectors[selectorsGroup] = {props:[]};
-				} else {
-					//The first selector piece (or the only one) in the selector grouping
-					if(!allSelectors[selectorFragments[0]]){ //if it is not yet defined
-						allSelectors[selectorFragments[0]] = {props:[]};
-					}
-					var currentSelector = allSelectors[selectorFragments[0]];
-					
-					for(var k = 1; k < selectorFragments.length; k ++){
-						if(!currentSelector[selectorFragments[k]]){
-							currentSelector[selectorFragments[k]] = {props:[]};
-						}
-						var currentSelector = currentSelector[selectorFragments[k]];
-					}
-				}
-				
-				//After determining what the deepest level of the selector
-				// group is, we start collecting properties
-				for(var m = startLineToProcess; m <= endLineToProcess; m++){
-					if (linesOfCode[m] == '}') {
-						continue;
-					}
-					var lineToStore = linesOfCode[m]
-					if(lineToStore[lineToStore.length - 1] === '}'){
-						lineToStore = lineToStore.replace(/}/g,'').trim();
-					}
-					currentSelector['props'].push(lineToStore);
-				}
-			}
-		}
-		
-		localStorage.setItem('codeInput', codeInput);
-		
-		var indentLevel = 0;
-		var outputString = '';
-		
-		//-----Now write back everything as a Sass-friendly file
-		//(under construction)
-		console.log(allSelectors);
-		document.getElementById('code-output').innerHTML =
-		"This feature hasn't been finished yet, but you can open the"+
-		" developer's console (assuming a CSS file was input) to see an object with"+
-		" a structure resembling SASS's nested selectors structure.";
-		
-	} // end of convertCssToSass()
+
 })();
 
