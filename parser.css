@@ -31,6 +31,14 @@ button {
     flex-direction: column;
 }
 
+.indent-by {
+    text-align: center;
+	font-size: 15px;
+	width: 60px;
+	overflow: hidden;
+	flex: none;
+}
+
 .textarea-container {
     display: flex;
     flex-direction: column;

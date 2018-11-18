@@ -21,12 +21,13 @@
 		element.className = element.className.replace(className, '');
 	}
 	
-	//Input and output will be saved if a code formatting button has been pressed
+	//Input and output will have been saved if the Fix Indent button was pressed
 	var savedCodeInput = localStorage.getItem('codeInput');
 	document.getElementById('code-input').innerHTML = savedCodeInput;
 	var savedCodeOutput = localStorage.getItem('codeOutput');
 	document.getElementById('code-output').innerHTML = savedCodeOutput;
-	
+	//Also get the previously saved value in the 'Indent by' box
+	document.getElementById('indent-by').value = localStorage.getItem('indentBy');
 	
 	var layoutFlippedString = localStorage.getItem('layoutFlipped');
 	if (layoutFlippedString === 'true'){
@@ -169,7 +170,21 @@
 	}
 	
 	function fixIndentation() {
+		var indentEachLevelBy;
+		var valueOfIndentByBox = document.getElementById('indent-by').value;
+		if (valueOfIndentByBox === '1 space') {
+			indentEachLevelBy = ' ';
+		} else if (valueOfIndentByBox === '2 space') {
+			indentEachLevelBy = '  ';
+		} else if (valueOfIndentByBox === '4 space') {
+			indentEachLevelBy = '    ';
+		} else if (valueOfIndentByBox === '1 tab') {
+			indentEachLevelBy = '\t';
+		}
+		
+		//Keep track of how many levels deep the current line's indentation is (1,2,3,...)
 		var currentIndentLevel = 0;
+		
 		//Lines to be indented before output & lines used to count brackets for indenting
 		var linesOfCodeToOutput = codeInput.split('\n');
 		var linesOfCodeToCountIndent = getProcessedLinesOfCode();
@@ -185,7 +200,7 @@
 			else actualIndentAmount = currentIndentLevel;
 			
 			for (var j = 0; j < actualIndentAmount; j++){
-				formattedOutput += '\t';
+				formattedOutput += indentEachLevelBy;
 			} //After adding indentation, add the trimmed line of code then a newline
 			formattedOutput += lineToOutput + '\n';
 			//Count and adjust current indent using the processed line of code
@@ -193,6 +208,7 @@
 		}
 		localStorage.setItem('codeInput', codeInput);
 		localStorage.setItem('codeOutput', formattedOutput);
+		localStorage.setItem('indentBy', valueOfIndentByBox);
 		
 		document.getElementById('code-output').innerHTML = formattedOutput;
 	}
