@@ -30,9 +30,9 @@
 	var indentByValue = localStorage.getItem('indentBy');
 	if (indentByValue === null) {
 		document.getElementById('indent-by').value = '1 tab';
+	} else {
+		document.getElementById('indent-by').value = indentByValue;
 	}
-	document.getElementById('indent-by').value = indentByValue;
-	
 	
 	var layoutFlippedString = localStorage.getItem('layoutFlipped');
 	if (layoutFlippedString === 'true'){
