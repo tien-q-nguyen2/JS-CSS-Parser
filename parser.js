@@ -27,7 +27,12 @@
 	var savedCodeOutput = localStorage.getItem('codeOutput');
 	document.getElementById('code-output').innerHTML = savedCodeOutput;
 	//Also get the previously saved value in the 'Indent by' box
-	document.getElementById('indent-by').value = localStorage.getItem('indentBy');
+	var indentByValue = localStorage.getItem('indentBy');
+	if (indentByValue === null) {
+		document.getElementById('indent-by').value = '1 tab';
+	}
+	document.getElementById('indent-by').value = indentByValue;
+	
 	
 	var layoutFlippedString = localStorage.getItem('layoutFlipped');
 	if (layoutFlippedString === 'true'){
