@@ -28,7 +28,7 @@
 	document.getElementById('code-output').innerHTML = savedCodeOutput;
 	//Also get the previously saved value in the 'Indent by' box
 	var indentByValue = localStorage.getItem('indentBy');
-	if (indentByValue === null) {
+	if (indentByValue === null) { //default to 1 tab if no value saved
 		document.getElementById('indent-by').value = '1 tab';
 	} else {
 		document.getElementById('indent-by').value = indentByValue;
