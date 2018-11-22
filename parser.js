@@ -128,9 +128,9 @@
 						insideMultiLineComment = false;
 						skipAnIteration = true; //skip over processing the '/' after '*'
 					}
-					else if (currentLine[j] === '/' && currentLine[j-1] !== '\\'){
-						insideLiteralRegex = false;
-					}
+					//else if (currentLine[j] === '/' && currentLine[j-1] !== '\\'){
+					//	insideLiteralRegex = false;
+					//}
 				}
 				else {
 					if (currentLine[j] === "'"){
@@ -147,9 +147,9 @@
 						insideMultiLineComment = true;
 						skipAnIteration = true; //skip over processing the '*' after '/'
 					}
-					else if (currentLine[j] === '/'){
-						insideLiteralRegex = true;
-					}
+					//else if (currentLine[j] === '/'){
+					//	insideLiteralRegex = true;
+					//}
 					else {
 						processedLineChars.push(currentLine[j]);
 					}
