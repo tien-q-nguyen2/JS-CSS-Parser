@@ -103,7 +103,7 @@
 				continue;
 			}
 			//if current char is actually a number (0-9), NaN will not be returned here
-			else if (parseInt(currLine[currInd]) !== NaN) {
+			else if (currLine[currInd] >= 0 && currLine[currInd] <= 9) {
 				return true; //the forward slash is indeed part of a division
 			}				
 			else {
@@ -140,20 +140,26 @@
 				}
 				if (insideSingleQuotes || insideDoubleQuotes || insideSingleLineComment
 				|| insideMultiLineComment || insideLiteralRegex){
+					if(insideSingleLineComment) continue;
 					if (currentLine[j] === "'"){
+						if(!insideSingleQuotes) continue;
 						insideSingleQuotes = false;
 					}
 					else if (currentLine[j] === '"'){
+						if(!insideDoubleQuotes) continue;
 						insideDoubleQuotes = false;
 					}
 					else if (currentLine.substring(j, j + 2) === '*/'){
+						if(!insideMultiLineComment) continue;
 						insideMultiLineComment = false;
 						skipAnIteration = true; //skip over processing the '/' after '*'
 					}
 					else if (currentLine[j] === '/' && currentLine[j-1] !== '\\'){
+						if(!insideLiteralRegex) continue;
 						insideLiteralRegex = false;
 					}
 				}
+				
 				else {
 					if (currentLine[j] === "'"){
 						insideSingleQuotes = true;
@@ -213,9 +219,16 @@
 		//Keep track of how many levels deep the current line's indentation is (1,2,3,...)
 		var currentIndentLevel = 0;
 		
-		//Lines to be indented before output & lines used to count brackets for indenting
+		//Raw lines of code & processed lines of code used to count brackets for indenting
 		var linesOfCodeToOutput = codeInput.split('\n');
 		var linesOfCodeToCountIndent = getProcessedLinesOfCode();
+
+		//DEBUG: Uncomment to see what types of lines are being evaluated for indenting
+		// for (var i = 0; i < linesOfCodeToCountIndent.length; i ++) {
+		// 	console.log(linesOfCodeToCountIndent[i]);
+		// }
+
+		//Evaluate the processed lines of code and set the final formatted code output
 		var formattedOutput = '';
 		for (var i = 0; i < linesOfCodeToOutput.length; i++){
 			var lineToCountIndent = linesOfCodeToCountIndent[i].trim();
