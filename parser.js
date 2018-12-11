@@ -113,6 +113,20 @@
 		return false;
 	}
 	
+	//check to see if there is an even number of \ before a char inside a regex
+	// -inside a regex, \\\\] means \\] and \] means we escape the end square bracket
+	// -same thing with /, \/ means we escape the end of the regex to get a /
+	function evenNumberOfBackSlashesBefore(index, currLine) {
+		var currInd = index - 1;
+		var count = 0;
+		while(currLine[currInd] === '\\') {
+			count++;
+			currInd--;
+		}
+		if (count % 2 === 0) return true;
+		else return false;
+	}
+	
 	//=================FIX INDENTATION CODE SECTION==================//
 	// Remove comments, regex and contents inside quotes before counting the brackets
 	function getProcessedLinesOfCode(){
@@ -121,6 +135,7 @@
 		var insideSingleLineComment = false;
 		var insideMultiLineComment = false;
 		var insideLiteralRegex = false;
+		var insideSquareBrackets = false;
 		
 		var skipAnIteration = 0;
 		
@@ -138,9 +153,31 @@
 					skipAnIteration = false;
 					continue;
 				}
+				//if inside a code section to skip over when evaluating indentation
 				if (insideSingleQuotes || insideDoubleQuotes || insideSingleLineComment
 				|| insideMultiLineComment || insideLiteralRegex){
-					if(insideSingleLineComment) continue;
+					if (insideSingleLineComment) continue;
+					if (insideLiteralRegex) {
+						if (!insideSquareBrackets){
+							if (currentLine[j] === '[' 
+							&& evenNumberOfBackSlashesBefore(j, currentLine)){
+								insideSquareBrackets = true;
+							}
+						}
+						else {
+							if (currentLine[j] === ']' 
+							&& evenNumberOfBackSlashesBefore(j, currentLine)){
+								insideSquareBrackets = false;
+							}
+						}
+						if (currentLine[j] === '/'
+						&& evenNumberOfBackSlashesBefore(j, currentLine)){
+							if(!insideSquareBrackets){
+								insideLiteralRegex = false;
+							}
+						}
+						continue;
+					}
 					if (currentLine[j] === "'"){
 						if(!insideSingleQuotes) continue;
 						insideSingleQuotes = false;
@@ -154,13 +191,9 @@
 						insideMultiLineComment = false;
 						skipAnIteration = true; //skip over processing the '/' after '*'
 					}
-					else if (currentLine[j] === '/' && currentLine[j-1] !== '\\'){
-						if(!insideLiteralRegex) continue;
-						insideLiteralRegex = false;
-					}
 				}
-				
-				else {
+			
+				else {//not inside any code section to skip over when evaluating indentation
 					if (currentLine[j] === "'"){
 						insideSingleQuotes = true;
 					}
@@ -203,6 +236,7 @@
 		return indent;
 	}
 	
+	//This function is called when the user clicks on the 'Fix Indent' button
 	function fixIndentation() {
 		var indentEachLevelBy;
 		var valueOfIndentByBox = document.getElementById('indent-by').value;
@@ -224,9 +258,9 @@
 		var linesOfCodeToCountIndent = getProcessedLinesOfCode();
 
 		//DEBUG: Uncomment to see what types of lines are being evaluated for indenting
-		// for (var i = 0; i < linesOfCodeToCountIndent.length; i ++) {
+		//for (var i = 0; i < linesOfCodeToCountIndent.length; i ++) {
 		// 	console.log(linesOfCodeToCountIndent[i]);
-		// }
+		//}
 
 		//Evaluate the processed lines of code and set the final formatted code output
 		var formattedOutput = '';
