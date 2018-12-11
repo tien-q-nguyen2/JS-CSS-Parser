@@ -92,6 +92,26 @@
 	getCodeButton.addEventListener('click', getCodeFromTextArea);
 	getCodeButton.addEventListener('click', fixIndentation);
 	
+	//Helper function to check if forward slash is part of a disivion (e.g. (50*5)/6)
+	isTheSlashADivisionAt(index, currLine) { //(curr is short for current)
+		//start at the given index, moving backward in currLine, if encounter space(s) or
+		// ')', continue, if encounter a number, stops and return true; else return false
+		var currInd = index - 1;
+		while(currInd >= 0) {
+			if (currLine[currInd] == ' ' || currLine[currInd] == ')') {
+				currInd--;
+				continue;
+			}
+			//if current char is actually a number (0-9), NaN will not be returned here
+			else if (parseInt(currLine[currInd]) !== NaN) {
+				return true; //the forward slash is indeed part of a division
+			}				
+			else {
+				return false;
+			}
+		}
+	}
+	
 	//=================FIX INDENTATION CODE SECTION==================//
 	// Remove comments, regex and contents inside quotes before counting the brackets
 	function getProcessedLinesOfCode(){
@@ -129,6 +149,9 @@
 						insideMultiLineComment = false;
 						skipAnIteration = true; //skip over processing the '/' after '*'
 					}
+					else if (currentLine[j] === '/' && currentLine[j-1] !== '\\'){
+						insideLiteralRegex = false;
+					}
 				}
 				else {
 					if (currentLine[j] === "'"){
@@ -144,6 +167,10 @@
 					else if (currentLine.substring(j, j + 2) === '/*'){
 						insideMultiLineComment = true;
 						skipAnIteration = true; //skip over processing the '*' after '/'
+					}
+					else if (currentLine[j] === '/' && //'/' either means regex or division
+					!isTheSlashADivisionAt(j, currentLine){
+						insideLiteralRegex = true;
 					}
 					else {
 						processedLineChars.push(currentLine[j]);
