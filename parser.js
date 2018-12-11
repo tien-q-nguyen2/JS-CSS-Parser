@@ -93,7 +93,7 @@
 	getCodeButton.addEventListener('click', fixIndentation);
 	
 	//Helper function to check if forward slash is part of a disivion (e.g. (50*5)/6)
-	isTheSlashADivisionAt(index, currLine) { //(curr is short for current)
+	function isTheSlashADivisionAt(index, currLine) { //(curr is short for current)
 		//start at the given index, moving backward in currLine, if encounter space(s) or
 		// ')', continue, if encounter a number, stops and return true; else return false
 		var currInd = index - 1;
@@ -110,6 +110,7 @@
 				return false;
 			}
 		}
+		return false;
 	}
 	
 	//=================FIX INDENTATION CODE SECTION==================//
@@ -169,7 +170,7 @@
 						skipAnIteration = true; //skip over processing the '*' after '/'
 					}
 					else if (currentLine[j] === '/' && //'/' either means regex or division
-					!isTheSlashADivisionAt(j, currentLine){
+					!isTheSlashADivisionAt(j, currentLine) ){
 						insideLiteralRegex = true;
 					}
 					else {
