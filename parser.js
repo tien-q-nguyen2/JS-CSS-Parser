@@ -98,15 +98,25 @@
 		// ')', continue, if encounter a number, stops and return true; else return false
 		var currInd = index - 1;
 		while(currInd >= 0) {
+			//If encounter +, (, =, ?, we know that the / is part of a regex (=/= division)
+			if (currLine[currInd] == '+' || currLine[currInd] == '(' ||
+			currLine[currInd] == '=' || currLine[currInd] == '?'){
+				return false; // therefore we return false
+			}
+
 			if (currLine[currInd] == ' ' || currLine[currInd] == ')') {
 				currInd--;
 				continue;
 			}
-			//if current char is actually a number (0-9), NaN will not be returned here
-			else if (currLine[currInd] >= 0 && currLine[currInd] <= 9) {
-				return true; //the forward slash is indeed part of a division
+			//if encounter a number, a letter or an underscore character (all of which can
+			// be in a variable name), the forward slash is considered part of a division
+			else if ( (currLine[currInd] >= 'a' && currLine[currInd] <= 'z') || 
+			(currLine[currInd] >= 'A' && currLine[currInd] <= 'Z') || 
+			(currLine[currInd] >= '0' && currLine[currInd] <= '9') || 
+			currLine[currInd] == '_' ){
+				return true;
 			}				
-			else {
+			else { //if not ' ', ')' or any above case, '/' is not part of a division
 				return false;
 			}
 		}
@@ -145,9 +155,18 @@
 		
 		//Note: This loop assumes that the syntax of the provided CSS/JS code is correct
 		for (var i = 0; i < linesOfCode.length; i++){
+			
 			insideSingleLineComment = false; //new line -> no more in a single line comment
 			processedLineChars = []; //reset array containing chars of the current line
 			var currentLine = linesOfCode[i].trim();
+
+			// '//' in an import statement will sometimes mess things up, for example:
+			// @import url(https://fonts.googleapis.com/css?family=Nunito);/*!
+			if (currentLine.substring(0, 7) == '@import'){ //if we see @import statement,
+				currentLine = // create a new line of code that has it removed
+					currentLine.substring(currentLine.indexOf(';'), currentLine.length);
+			}
+
 			for (var j = 0; j < currentLine.length; j++){
 				if (skipAnIteration){
 					skipAnIteration = false;
