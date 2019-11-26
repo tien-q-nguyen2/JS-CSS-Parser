@@ -89,8 +89,10 @@
 	}
 	
 	var getCodeButton = document.getElementById('fix-indent-btn');
-	getCodeButton.addEventListener('click', getCodeFromTextArea);
-	getCodeButton.addEventListener('click', fixIndentation);
+	getCodeButton.addEventListener('click', function(){
+		getCodeFromTextArea();
+		fixIndentation();
+	});
 	
 	//Helper function to check if forward slash is part of a disivion (e.g. (50*5)/6)
 	function isTheSlashADivisionAt(index, currLine) { //(curr is short for current)
